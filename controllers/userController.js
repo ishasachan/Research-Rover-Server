@@ -171,7 +171,7 @@ exports.updateUserPreferences = async (req, res) => {
     user = await user.save();
 
     const emailContent = `Dear ${user.name},\n\nYour preferences and associated research papers have been updated successfully. Here are your research papers:\n\n${user.interests.map(interest => {
-      return `Interest: ${interest.name}\nResearch Papers:\n${interest.researchPapers.map(paper => `Title: ${paper.title}\nAuthors: ${paper.creators.join(', ')}\n\n`).join('')}`;
+      return `Interest: ${interest.name}\nResearch Papers:\n${interest.researchPapers.map(paper => `Title: ${paper.title}\nAuthors: ${paper.creators.join(', ')}\n\nPDF URL: ${paper.pdfUrl}\nHTML URL: ${paper.htmlUrl}`).join('')}`;
     }).join('\n')}`;
 
     await sendEmail(user.email, 'Preferences and Research Papers Updated', emailContent);
