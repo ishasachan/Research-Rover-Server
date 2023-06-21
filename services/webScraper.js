@@ -15,7 +15,8 @@ async function scrapeResearchPapers(searchQuery) {
     const journals = records.map(record => {
       const htmlUrl = record.url.find(url => url.format === 'html' && url.platform === 'web')?.value;
       const pdfUrl = record.url.find(url => url.format === 'pdf' && url.platform === 'web')?.value;
-      const creators = record.creators.map(creator => creator.creator);
+      const creators = record.creators && record.creators.map(creator => creator.creator);
+
       
       return {
         title: record.title,

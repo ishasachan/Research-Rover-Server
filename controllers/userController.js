@@ -128,18 +128,35 @@ exports.loginUser = async (req, res) => {
 exports.updateUserPreferences = async (req, res) => {
   try {
     const { email, interests } = req.body;
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    // Check if the user has already updated their preferences
-    if (user.interests.length > 0) {
-      // User has already updated their preferences, send weekly email
-      const lastEmailDate = user.lastEmailDate || user.registrationDate;
-      const oneWeekAgo = new Date().setDate(new Date().getDate() - 7);
+    // Check if it has been more than 7 days since the last email was sent
+    const lastEmailSent = new Date(user.lastEmailDate);
+    const today = new Date();
+    const daysSinceLastEmail = Math.floor((today - lastEmailSent) / (1000 * 60 * 60 * 24));
 
-    // Iterate over the interests array and save the associated research papers
+    if (daysSinceLastEmail < 7) {
+      // Update the preferences without sending an email
+      user.interests = [];
+      for (const interest of interests) {
+        const researchPapers = await scrapeResearchPapers(interest);
+        const interestObject = {
+          name: interest,
+          researchPapers: researchPapers,
+        };
+        user.interests.push(interestObject);
+      }
+
+      user = await user.save();
+
+      return res.json({ message: 'User preferences updated successfully. Email not sent.', user });
+    }
+
+    // Update the preferences and send the email
+    user.interests = [];
     for (const interest of interests) {
       const researchPapers = await scrapeResearchPapers(interest);
       const interestObject = {
@@ -149,39 +166,27 @@ exports.updateUserPreferences = async (req, res) => {
       user.interests.push(interestObject);
     }
 
-    await user.save();
+    user.lastEmailDate = today; // Update the lastEmailDate field
 
-    if (lastEmailDate > oneWeekAgo) {
-      // It has not been a week since the last email, skip sending
-      return res.json({ message: 'User preferences updated successfully. Weekly email skipped.' });
-    }
-  }
+    user = await user.save();
 
-  // Iterate over the interests array and save the associated research papers
-  for (const interest of interests) {
-    const researchPapers = await scrapeResearchPapers(interest);
-    const interestObject = {
-      name: interest,
-      researchPapers: researchPapers,
-    };
-    user.interests.push(interestObject);
-  }
-
-    // Compose and send the email
     const emailContent = `Dear ${user.name},\n\nYour preferences and associated research papers have been updated successfully. Here are your research papers:\n\n${user.interests.map(interest => {
       return `Interest: ${interest.name}\nResearch Papers:\n${interest.researchPapers.map(paper => `Title: ${paper.title}\nAuthors: ${paper.creators.join(', ')}\n\n`).join('')}`;
     }).join('\n')}`;
 
     await sendEmail(user.email, 'Preferences and Research Papers Updated', emailContent);
 
-    await user.save();
-
-    res.json({ message: 'User preferences updated successfully. Email sent.' });
+    res.json({ message: 'User preferences updated successfully. Email sent.', user });
   } catch (error) {
     console.error('Error updating user preferences:', error);
     res.status(500).json({ error: 'Failed to update user preferences.' });
   }
 }
+
+
+
+
+
 
 
 

@@ -17,29 +17,33 @@ async function sendWeeklyEmails() {
       console.log(`Last Email Date: ${lastEmailDate}`);
       console.log(`Current Time: ${currentDate}`);
 
-      // Calculate the time difference in milliseconds between the last email date and the current date
-      const timeDiff = currentDate.getTime() - lastEmailDate.getTime();
-      const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+      if (lastEmailDate instanceof Date) {
+        // Calculate the time difference in milliseconds between the last email date and the current date
+        const timeDiff = currentDate.getTime() - lastEmailDate.getTime();
+        const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
-      console.log(`Days since last email: ${daysDiff}`);
+        console.log(`Days since last email: ${daysDiff}`);
 
-      // Check if it's been more than a week since the last email
-      if (daysDiff >= 7) {
-        console.log(`Sending weekly email to ${name} (${email})`);
+        // Check if it's been more than a week since the last email
+        if (daysDiff >= 7) {
+          console.log(`Sending weekly email to ${name} (${email})`);
 
-        // Generate the email content
-        const emailContent = generateEmailContent(interests);
+          // Generate the email content
+          const emailContent = generateEmailContent(interests);
 
-        // Send the email
-        await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
+          // Send the email
+          await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
-        // Update the last email date to the current date
-        user.lastEmailDate = currentDate;
-        await user.save();
+          // Update the last email date to the current date
+          user.lastEmailDate = new Date();
+          await user.save();
 
-        console.log(`Email sent to ${name} (${email})`);
+          console.log(`Email sent to ${name} (${email})`);
+        } else {
+          console.log(`Not sending email to ${name} (${email}). Last email sent less than a week ago.`);
+        }
       } else {
-        console.log(`Not sending email to ${name} (${email}). Last email sent less than a week ago.`);
+        console.log(`Not sending email to ${name} (${email}). Invalid last email date.`);
       }
     }
   } catch (error) {
@@ -102,3 +106,5 @@ async function sendEmail(recipient, subject, content) {
 // Call the sendWeeklyEmails function every 10 seconds
 // setInterval(sendWeeklyEmails, 3600000);
 setInterval(sendWeeklyEmails, 60000);
+
+module.exports = { sendWeeklyEmails };

@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
-const schedulerService = require('./services/scheduler');
+const {sendWeeklyEmails} = require('./services/scheduler');
 
 // Import routes
 const routes = require('./routes');
@@ -19,7 +19,7 @@ mongoose
   .then(() => {
     console.log('Connected to MongoDB');
     // Start the scheduler
-    schedulerService();
+    sendWeeklyEmails();
   })
   .catch((error) => console.error('Error connecting to MongoDB:', error));
 
@@ -36,3 +36,5 @@ app.use('/api', routes);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+
