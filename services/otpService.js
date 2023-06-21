@@ -5,35 +5,35 @@ const config = require('../config/config');
 
 // Generate OTP
 exports.generateOTP = () => {
-  return otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
+	return otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
 };
 
 // Save OTP to the database
 exports.saveOTP = async (email, otp) => {
-  const user = await User.findOne({ email });
-  if (user) {
-    user.otp = otp;
-    await user.save();
-  }
+	const user = await User.findOne({ email });
+	if (user) {
+		user.otp = otp;
+		await user.save();
+	}
 };
 
 // Send OTP to user's email
 exports.sendOTP = async (email, otp) => {
-  try {
-    const transporter = nodemailer.createTransport({
-      host: config.smtpHost,
-      port: config.smtpPort,
-      auth: {
-        user: config.smtpUser,
-        pass: config.smtpPassword,
-      },
-    });
+	try {
+		const transporter = nodemailer.createTransport({
+			host: config.smtpHost,
+			port: config.smtpPort,
+			auth: {
+				user: config.smtpUser,
+				pass: config.smtpPassword,
+			},
+		});
 
-    const message = {
-      from: config.smtpUser,
-      to: email,
-      subject: 'OTP for Registration',
-      html: `
+		const message = {
+			from: config.smtpUser,
+			to: email,
+			subject: 'OTP for Registration',
+			html: `
       <!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 
@@ -277,23 +277,23 @@ exports.sendOTP = async (email, otp) => {
 
 </html>
       `,
-    };
+		};
 
-    await transporter.sendMail(message);
-  } catch (error) {
-    console.error('Error sending OTP email:', error);
-    throw new Error('Failed to send OTP email.');
-  }
+		await transporter.sendMail(message);
+	} catch (error) {
+		console.error('Error sending OTP email:', error);
+		throw new Error('Failed to send OTP email.');
+	}
 };
 
 
 // Verify OTP
 exports.verifyOTP = async (email, otp) => {
-  const user = await User.findOne({ email, otp });
-  if (user) {
-    user.otp = '';
-    await user.save();
-    return true;
-  }
-  return false;
+	const user = await User.findOne({ email, otp });
+	if (user) {
+		user.otp = '';
+		await user.save();
+		return true;
+	}
+	return false;
 };

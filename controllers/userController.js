@@ -1,13 +1,13 @@
 const User = require('../models/user');
 const otpService = require('../services/otpService');
 const { scrapeResearchPapers } = require('../services/webScraper');
-const { sendEmail } = require('../services/emailService');
+const { sendEmail, generateEmailContent } = require('../services/scheduler');
+
 
 // Generate OTP and send it to the user's email
 exports.generateOTP = async (req, res) => {
   try {
     const { name, email } = req.body;
-
     // Generate OTP
     const otp = otpService.generateOTP();
 
@@ -167,14 +167,13 @@ exports.updateUserPreferences = async (req, res) => {
     }
 
     user.lastEmailDate = today; // Update the lastEmailDate field
-
     user = await user.save();
 
-    const emailContent = `Dear ${user.name},\n\nYour preferences and associated research papers have been updated successfully. Here are your research papers:\n\n${user.interests.map(interest => {
-      return `Interest: ${interest.name}\nResearch Papers:\n${interest.researchPapers.map(paper => `Title: ${paper.title}\nAuthors: ${paper.creators.join(', ')}\n\nPDF URL: ${paper.pdfUrl}\nHTML URL: ${paper.htmlUrl}`).join('')}`;
-    }).join('\n')}`;
+    // Send email to the user
+    const emailContent = generateEmailContent(user.name, user.interests);
 
-    await sendEmail(user.email, 'Preferences and Research Papers Updated', emailContent);
+    // Send the email
+    await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
     res.json({ message: 'User preferences updated successfully. Email sent.', user });
   } catch (error) {
@@ -182,10 +181,6 @@ exports.updateUserPreferences = async (req, res) => {
     res.status(500).json({ error: 'Failed to update user preferences.' });
   }
 }
-
-
-
-
 
 
 
