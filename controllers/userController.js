@@ -68,16 +68,14 @@ exports.registerUser = async (req, res) => {
 exports.generateLoginOTP = async (req, res) => {
   try {
     const { email } = req.body;
-
     // Generate OTP
     const otp = otpService.generateOTP();
-
-    // Create a new user or find an existing user
+    // Find an existing user
     let user = await User.findOne({ email });
-
     if (!user) {
       // Create a new user if not found
-      user = new User({ email });
+      console.error('User does not exist!', error);
+      res.status(404).json({ error: 'User does not exist.' });
     }
 
     // Save the generated OTP to the user's document in the database
