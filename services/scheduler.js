@@ -15,21 +15,24 @@ async function sendWeeklyEmails() {
       console.log(`Email Day: ${emailDay}`);
       console.log(`Email Time: ${emailTime}`);
       console.log(`Last Email Date: ${lastEmailDate}`);
-      console.log(`Current GMT (UTC) Time: ${currentDateTime}`);
+      console.log(`Current IST Time: ${currentDateTime}`);
 
       if (lastEmailDate instanceof Date) {
+        // Convert the current date and time to IST
+        const currentISTDateTime = new Date(currentDateTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+
         // Calculate the time difference in milliseconds between the last email date and the current date
-        const timeDiff = currentDateTime.getTime() - lastEmailDate.getTime();
+        const timeDiff = currentISTDateTime.getTime() - lastEmailDate.getTime();
         const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
         console.log(`Days since last email: ${daysDiff}`);
 
         // Check if it's been more than a week since the last email
         if (daysDiff >= 7) {
-          const currentDay = currentDateTime.getUTCDay(); // Get the current GMT (UTC) day (0 - Sunday, 1 - Monday, ...)
-          const currentTime = currentDateTime.getUTCHours() + ':' + currentDateTime.getUTCMinutes(); // Get the current GMT (UTC) time
+          const currentDay = currentISTDateTime.getDay(); // Get the current IST day (0 - Sunday, 1 - Monday, ...)
+          const currentTime = currentISTDateTime.getHours() + ':' + currentISTDateTime.getMinutes(); // Get the current IST time
 
-          // Check if the user's preference day and time match the current GMT (UTC) day and time
+          // Check if the user's preference day and time match the current IST day and time
           if (currentDay === emailDay && currentTime === emailTime) {
             console.log(`Sending weekly email to ${name} (${email})`);
 
@@ -40,12 +43,12 @@ async function sendWeeklyEmails() {
             await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
             // Update the last email date to the current date
-            user.lastEmailDate = currentDateTime;
+            user.lastEmailDate = currentISTDateTime;
             await user.save();
 
             console.log(`Email sent to ${name} (${email})`);
           } else {
-            console.log(`Not sending email to ${name} (${email}). Current GMT (UTC) day and time do not match the specified schedule.`);
+            console.log(`Not sending email to ${name} (${email}). Current IST day and time do not match the specified schedule.`);
           }
         } else {
           console.log(`Not sending email to ${name} (${email}). Last email sent less than a week ago.`);
@@ -58,6 +61,7 @@ async function sendWeeklyEmails() {
     console.error('Error sending weekly emails:', error);
   }
 }
+
 
 
 
