@@ -6,7 +6,7 @@ const config = require('../config/config');
 async function sendWeeklyEmails() {
   try {
     const users = await User.find();
-    const currentDateTime = new Date();
+    const currentDate = new Date();
 
     for (const user of users) {
       const { name, email, emailDay, emailTime, interests, lastEmailDate } = user;
@@ -15,43 +15,30 @@ async function sendWeeklyEmails() {
       console.log(`Email Day: ${emailDay}`);
       console.log(`Email Time: ${emailTime}`);
       console.log(`Last Email Date: ${lastEmailDate}`);
-      console.log(`Current IST Time: ${currentDateTime}`);
+      console.log(`Current Time: ${currentDate}`);
 
       if (lastEmailDate instanceof Date) {
-        // Convert the user's preference time to IST
-        const userISTTime = new Date(currentDateTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', hour12: false }));
-        userISTTime.setHours(parseInt(emailTime.split(':')[0], 10));
-        userISTTime.setMinutes(parseInt(emailTime.split(':')[1], 10));
-
         // Calculate the time difference in milliseconds between the last email date and the current date
-        const timeDiff = currentDateTime.getTime() - lastEmailDate.getTime();
+        const timeDiff = currentDate.getTime() - lastEmailDate.getTime();
         const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
         console.log(`Days since last email: ${daysDiff}`);
 
         // Check if it's been more than a week since the last email
         if (daysDiff >= 7) {
-          const currentDay = currentDateTime.getDay(); // Get the current IST day (0 - Sunday, 1 - Monday, ...)
-          const currentTime = `${currentDateTime.getHours()}:${currentDateTime.getMinutes().toString().padStart(2, '0')}`; // Get the current IST time
+          console.log(`Sending weekly email to ${name} (${email})`);
 
-          // Check if the user's preference day and time match the current IST day and time
-          if (currentDay === emailDay && currentTime === emailTime) {
-            console.log(`Sending weekly email to ${name} (${email})`);
+          // Generate the email content
+          const emailContent = generateEmailContent(name, interests);
 
-            // Generate the email content
-            const emailContent = generateEmailContent(name, interests);
+          // Send the email
+          await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
-            // Send the email
-            await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
+          // Update the last email date to the current date
+          user.lastEmailDate = new Date();
+          await user.save();
 
-            // Update the last email date to the current date
-            user.lastEmailDate = currentDateTime;
-            await user.save();
-
-            console.log(`Email sent to ${name} (${email})`);
-          } else {
-            console.log(`Not sending email to ${name} (${email}). Current IST day and time do not match the specified schedule.`);
-          }
+          console.log(`Email sent to ${name} (${email})`);
         } else {
           console.log(`Not sending email to ${name} (${email}). Last email sent less than a week ago.`);
         }
