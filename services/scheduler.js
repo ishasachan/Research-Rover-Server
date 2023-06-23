@@ -18,19 +18,21 @@ async function sendWeeklyEmails() {
       console.log(`Current IST Time: ${currentDateTime}`);
 
       if (lastEmailDate instanceof Date) {
-        // Convert the current date and time to IST
-        const currentISTDateTime = new Date(currentDateTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+        // Convert the user's preference time to IST
+        const userISTTime = new Date(currentDateTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', hour12: false }));
+        userISTTime.setHours(parseInt(emailTime.split(':')[0], 10));
+        userISTTime.setMinutes(parseInt(emailTime.split(':')[1], 10));
 
         // Calculate the time difference in milliseconds between the last email date and the current date
-        const timeDiff = currentISTDateTime.getTime() - lastEmailDate.getTime();
+        const timeDiff = currentDateTime.getTime() - lastEmailDate.getTime();
         const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
         console.log(`Days since last email: ${daysDiff}`);
 
         // Check if it's been more than a week since the last email
         if (daysDiff >= 7) {
-          const currentDay = currentISTDateTime.getDay(); // Get the current IST day (0 - Sunday, 1 - Monday, ...)
-          const currentTime = currentISTDateTime.getHours() + ':' + currentISTDateTime.getMinutes(); // Get the current IST time
+          const currentDay = currentDateTime.getDay(); // Get the current IST day (0 - Sunday, 1 - Monday, ...)
+          const currentTime = `${currentDateTime.getHours()}:${currentDateTime.getMinutes().toString().padStart(2, '0')}`; // Get the current IST time
 
           // Check if the user's preference day and time match the current IST day and time
           if (currentDay === emailDay && currentTime === emailTime) {
@@ -43,7 +45,7 @@ async function sendWeeklyEmails() {
             await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
             // Update the last email date to the current date
-            user.lastEmailDate = currentISTDateTime;
+            user.lastEmailDate = currentDateTime;
             await user.save();
 
             console.log(`Email sent to ${name} (${email})`);
@@ -61,6 +63,7 @@ async function sendWeeklyEmails() {
     console.error('Error sending weekly emails:', error);
   }
 }
+
 
 
 
