@@ -6,7 +6,7 @@ const config = require('../config/config');
 async function sendWeeklyEmails() {
   try {
     const users = await User.find();
-    const currentDate = new Date();
+    const currentDateTime = new Date();
 
     for (const user of users) {
       const { name, email, emailDay, emailTime, interests, lastEmailDate } = user;
@@ -15,21 +15,21 @@ async function sendWeeklyEmails() {
       console.log(`Email Day: ${emailDay}`);
       console.log(`Email Time: ${emailTime}`);
       console.log(`Last Email Date: ${lastEmailDate}`);
-      console.log(`Current Time: ${currentDate}`);
+      console.log(`Current GMT (UTC) Time: ${currentDateTime}`);
 
       if (lastEmailDate instanceof Date) {
         // Calculate the time difference in milliseconds between the last email date and the current date
-        const timeDiff = currentDate.getTime() - lastEmailDate.getTime();
+        const timeDiff = currentDateTime.getTime() - lastEmailDate.getTime();
         const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
         console.log(`Days since last email: ${daysDiff}`);
 
         // Check if it's been more than a week since the last email
         if (daysDiff >= 7) {
-          const currentDay = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
-          const currentTime = currentDate.toLocaleTimeString('en-US', { timeStyle: 'short' });
+          const currentDay = currentDateTime.getUTCDay(); // Get the current GMT (UTC) day (0 - Sunday, 1 - Monday, ...)
+          const currentTime = currentDateTime.getUTCHours() + ':' + currentDateTime.getUTCMinutes(); // Get the current GMT (UTC) time
 
-          // Check if the user's preference day and time match the current day and time
+          // Check if the user's preference day and time match the current GMT (UTC) day and time
           if (currentDay === emailDay && currentTime === emailTime) {
             console.log(`Sending weekly email to ${name} (${email})`);
 
@@ -40,12 +40,12 @@ async function sendWeeklyEmails() {
             await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
             // Update the last email date to the current date
-            user.lastEmailDate = new Date();
+            user.lastEmailDate = currentDateTime;
             await user.save();
 
             console.log(`Email sent to ${name} (${email})`);
           } else {
-            console.log(`Not sending email to ${name} (${email}). Current day and time do not match the specified schedule.`);
+            console.log(`Not sending email to ${name} (${email}). Current GMT (UTC) day and time do not match the specified schedule.`);
           }
         } else {
           console.log(`Not sending email to ${name} (${email}). Last email sent less than a week ago.`);
@@ -58,6 +58,7 @@ async function sendWeeklyEmails() {
     console.error('Error sending weekly emails:', error);
   }
 }
+
 
 
 // Function to generate the email content
