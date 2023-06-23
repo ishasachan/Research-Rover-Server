@@ -26,19 +26,27 @@ async function sendWeeklyEmails() {
 
         // Check if it's been more than a week since the last email
         if (daysDiff >= 7) {
-          console.log(`Sending weekly email to ${name} (${email})`);
+          const currentDay = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+          const currentTime = currentDate.toLocaleTimeString('en-US', { timeStyle: 'short' });
 
-          // Generate the email content
-          const emailContent = generateEmailContent(name, interests);
+          // Check if the current day and time match the user's specified day and time
+          if (currentDay === emailDay && currentTime === emailTime) {
+            console.log(`Sending weekly email to ${name} (${email})`);
 
-          // Send the email
-          await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
+            // Generate the email content
+            const emailContent = generateEmailContent(name, interests);
 
-          // Update the last email date to the current date
-          user.lastEmailDate = new Date();
-          await user.save();
+            // Send the email
+            await sendEmail(email, 'Weekly Research Paper Recommendations', emailContent);
 
-          console.log(`Email sent to ${name} (${email})`);
+            // Update the last email date to the current date
+            user.lastEmailDate = new Date();
+            await user.save();
+
+            console.log(`Email sent to ${name} (${email})`);
+          } else {
+            console.log(`Not sending email to ${name} (${email}). Current day and time do not match the specified schedule.`);
+          }
         } else {
           console.log(`Not sending email to ${name} (${email}). Last email sent less than a week ago.`);
         }
