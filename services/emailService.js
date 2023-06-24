@@ -68,14 +68,14 @@ exports.sendRecommendationEmail = async (email, papers) => {
       host: 'smtp.hostinger.com',
       port: 465,
       auth: {
-        user: 'hackshark@heistat49.com',
-        pass: 'Hack@shark11',
+        user: 'researchrover@brandlime.in',
+        pass: 'Research@11',
       },
     });
 
     // Compose the email message
     const message = {
-      from: 'hackshark@heistat49.com',
+      from: 'researchrover@brandlime.in',
       to: email,
       subject: 'Weekly Research Paper Recommendations',
       html: `
