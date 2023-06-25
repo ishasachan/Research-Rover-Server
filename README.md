@@ -1,6 +1,6 @@
 <p align="center">
-    <a href="https://github.com/Abhi6722/Research-Rover">
-        <img alt="Research Rover" src="https://github.com/Abhi6722/Research-Rover/blob/main/assets/images/SquareLogo.png" width="146">
+    <a href="https://github.com/ishasachan/Research-Rover">
+        <img alt="Research Rover" src="https://github.com/ishasachan/Research-Rover/blob/main/assets/images/SquareLogo.png" width="146">
     </a>
 </p>
 
@@ -13,11 +13,11 @@ Research Rover is a platform that revolutionizes access to research papers and e
 
 ***
 
-![Research Rover Banner](https://github.com/Abhi6722/Research-Rover/blob/main/assets/images/Research-Rover-Banner.png)
+![Research Rover Banner](https://github.com/ishasachan/Research-Rover/blob/main/assets/images/Research-Rover-Banner.png)
 
 ## Research Rover Frontend
 Since this application also uses forntend which we have created using Flutter so it is hosted on the following URL and you can have a look.
-[Research Rover Frontend](https://github.com/Abhi6722/Research-Rover)
+[Research Rover Frontend](https://github.com/ishasachan/Research-Rover)
 
 ## Problem Statement:
 Keeping up with the vast amount of research papers and staying informed about the latest developments in various fields is a challenge for researchers. Accessing relevant research papers based on specific interests is time-consuming and cumbersome.
@@ -48,8 +48,7 @@ Research Rover aims to streamline the research paper discovery process and make 
 
 *You can install and test the latest Research Rover app from the following link:*
 
-- [Live Link of Web Version](https://research-rover.netlify.app/)
-- [Download Research Rover App](https://github.com/Abhi6722/Research-Rover/releases/download/v1/research-rover.apk)
+- [Live Link of Web Version](https://researchrover.netlify.app/)
 
 # Contribution
 Since this is an Open Source Project anyone is free to make improvements in design and features of this application as long as it is without any issues.
@@ -57,7 +56,7 @@ Since this is an Open Source Project anyone is free to make improvements in desi
 ## Steps for Contribution
 - First You have to Copy the Project in your local machine using the following command
 ```
-git clone https://github.com/Abhi6722/Research-Rover-Server
+git clone https://github.com/ishasachan/Research-Rover-Server
 ```
 - Now You have to install the requirements and dependencies of the Backend project. Make sure that you have Node installed on your local system [https://nodejs.org/en](https://nodejs.org/en)
 ```
@@ -87,10 +86,4 @@ The application is divided into different folders and logic of each page in its 
 **NOTE**
 
 Make sure that there is no breaking changes in the application and it follows all the guidelines and open source protocols. Now since this application also have a frontend part so to make any changes into that you have to visit the frontend part of our application. 
-[https://github.com/Abhi6722/Research-Rover](https://github.com/Abhi6722/Research-Rover)
-
----
-  
-# Demo Video:
-[![Research Rover Demo Video](https://github.com/Abhi6722/Research-Rover/blob/main/assets/images/Research-Rover-Banner.png)](https://youtu.be/4GJ84qS809Q)
-
+[https://github.com/ishasachan/Research-Rover](https://github.com/ishasachan/Research-Rover)
